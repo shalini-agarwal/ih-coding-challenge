@@ -22,7 +22,9 @@ Break each element into a series of space-delimited segments and identify whethe
 
 ''' Assumption: The exam record IDs will be unique, i.e. two patients can't have the same exam ID'''
 
-def addPatient(record):
+import os
+
+def addPatient(record,patient_record,exam_record):
     p_id = record[0]
     first_name = record[1]
     last_name = record[2]
@@ -33,7 +35,7 @@ def addPatient(record):
         exam_record[p_id] = {}
         return 'new patient added'
 
-def addExam(record):
+def addExam(record,patient_record,exam_record):
     patient_id = record[0]
     exam_id = record[1]
     if patient_id in patient_record:
@@ -46,7 +48,7 @@ def addExam(record):
     else:
         return 'no patient record'
 
-def delPatient(record):
+def delPatient(record,patient_record,exam_record):
     if record in patient_record:
         patient_record.pop(record)
         exam_record.pop(record)
@@ -54,7 +56,7 @@ def delPatient(record):
     else:
         return "patient doesn't exists"
 
-def delExam(record):
+def delExam(record,exam_record):
     for p_id in exam_record:
         if record in exam_record[p_id]:
             exam_record[p_id].pop(record)
@@ -62,35 +64,36 @@ def delExam(record):
     else:
         return "exam record doesn't exist"
 
-def patientSummary():
+def patientSummary(patient_record,exam_record):
     str = ""
-    for key in patient_record:
-        if key in exam_record:
-            str = str + f'Name: {patient_record[key]}, ID: {key}, Exam Count: {len(exam_record[key])}' + '\n'
-        else:
-            str = str + f'Name: {patient_record[key]}, ID: {key}, Exam Count: 0' + '\n'
-    
+    for p_id in patient_record:
+        str = str + f'Name: {patient_record[p_id]}, ID: {p_id}, Exam Count: {len(exam_record[p_id]) if p_id in exam_record else 0}' + '\n'    
     return str
 
+def main():
+    curr_path = os.getcwd()
+    file_name = 'input1.txt'
+    file = open(f'{curr_path}/../input/{file_name}','r')
+    data = file.readlines()
+    patient_record = {}
+    exam_record = {}
 
-#add all to main function
-file = open(r'/Users/shaliniagarwal/Documents/IdentifeyeHealth/git-folder/ih-coding-challenge/input/input3.txt','r') #change to generic file read form
-data = file.readlines() #records
-patient_record = {}
-exam_record = {}
+    for record_line in data:
+        instruction = record_line.split()
+        if instruction[0] == 'ADD':
+            if instruction[1] == 'PATIENT':
+                msg = addPatient(instruction[2:],patient_record,exam_record)
 
-for d in data:
-    instr = d.split()
-    if instr[0] == 'ADD' and instr[1] == 'PATIENT': #if-else
-        msg = addPatient(instr[2:])
-    
-    if instr[0] == 'ADD' and instr[1] == 'EXAM':
-        msg = addExam(instr[2:])
+            else: # it is EXAM
+                msg = addExam(instruction[2:],patient_record,exam_record)
+            
+        else: # it is DEL
+            if instruction[1] == 'PATIENT':
+                msg = delPatient(instruction[2],patient_record,exam_record)
+        
+            else: # it is EXAM
+                msg = delExam(instruction[2],exam_record)
 
-    if instr[0] == 'DEL' and instr[1] == 'PATIENT':
-        msg = delPatient(instr[2])
-    
-    if instr[0] == 'DEL' and instr[1] == 'EXAM':
-        msg = delExam(instr[2])
+    print(patientSummary(patient_record,exam_record))
 
-print(patientSummary())
+main()
