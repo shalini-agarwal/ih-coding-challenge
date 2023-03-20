@@ -22,17 +22,19 @@ Break each element into a series of space-delimited segments and identify whethe
 
 ''' Assumption: The exam record IDs will be unique, i.e. two patients can't have the same exam ID'''
 
+''' Please run the file from backend folder '''
+
 import os
 
 def addPatient(record,patient_record,exam_record):
     p_id = record[0]
     first_name = record[1]
     last_name = record[2]
-    if p_id in patient_record: 
+    if p_id in patient_record: #edge case
         return 'patient already exists'
     else:
-        patient_record[p_id] = first_name + " " + last_name
-        exam_record[p_id] = {}
+        patient_record[p_id] = first_name + " " + last_name #storing new patient data in the dictionary
+        exam_record[p_id] = {} #creating an empty exam record for newly added patient #used a dictionary instead of list to reduce complexity
         return 'new patient added'
 
 def addExam(record,patient_record,exam_record):
@@ -40,46 +42,46 @@ def addExam(record,patient_record,exam_record):
     exam_id = record[1]
     if patient_id in patient_record:
         for p_id in exam_record:
-            if exam_id in exam_record[p_id]:
+            if exam_id in exam_record[p_id]: #edge case
                 return 'exam ID already exists'
 
-        exam_record[patient_id][exam_id] = True
+        exam_record[patient_id][exam_id] = True #if this exam_id doesn't exist add it to exam record
         return 'exam ID added'
     else:
-        return 'no patient record'
+        return 'no patient record' #edge case
 
 def delPatient(record,patient_record,exam_record):
     if record in patient_record:
         patient_record.pop(record)
-        exam_record.pop(record)
+        exam_record.pop(record) #remove record from both data structures
         return 'patient record deleted'
     else:
-        return "patient doesn't exists"
+        return "patient doesn't exists" #edge case
 
 def delExam(record,exam_record):
     for p_id in exam_record:
         if record in exam_record[p_id]:
-            exam_record[p_id].pop(record)
+            exam_record[p_id].pop(record) #remove record if found
             return 'exam record deleted'
     else:
-        return "exam record doesn't exist"
+        return "exam record doesn't exists" # edge case
 
 def patientSummary(patient_record,exam_record):
     str = ""
     for p_id in patient_record:
-        str = str + f'Name: {patient_record[p_id]}, ID: {p_id}, Exam Count: {len(exam_record[p_id]) if p_id in exam_record else 0}' + '\n'    
+        str = str + f'Name: {patient_record[p_id]}, ID: {p_id}, Exam Count: {len(exam_record[p_id]) if p_id in exam_record else 0}\n'    
     return str
 
 def main():
     curr_path = os.getcwd()
-    file_name = 'input1.txt'
-    file = open(f'{curr_path}/../input/{file_name}','r')
-    data = file.readlines()
-    patient_record = {}
-    exam_record = {}
+    file_name = 'input1.txt' #file name of the test file
+    file = open(f'{curr_path}/../input/{file_name}','r') #please run the file from backend folder
+    data = file.readlines() #opening the file and storing all lines in memory
+    patient_record = {} #using a dictionary to have O(1) time complexity for most functionalities
+    exam_record = {} #using a dictionary to have O(1) time complexity for most functionalities
 
-    for record_line in data:
-        instruction = record_line.split()
+    for record_line in data: #processing each command one-by-one
+        instruction = record_line.split() #using python's split() method to process every part of the instruction
         if instruction[0] == 'ADD':
             if instruction[1] == 'PATIENT':
                 msg = addPatient(instruction[2:],patient_record,exam_record)
