@@ -1,4 +1,6 @@
 """
+Approach:- 
+
 Read the complete input file using readlines command and store it in a list with each line represented as a string. 
 Take this list and start processing each element.
 Break each element into a series of space-delimited segments and identify whether the first element is ADD or DEL. 
